@@ -7,24 +7,25 @@ from django.http import HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import status
-from rest_framework.parsers import JSONParser
-from rest_framework.exceptions import ParseError
+from rest_framework.decorators import api_view
 
 from .models.snippet import Snippet
 from .serializers.snippet_serializer import SnippetSerializer
 
 
 @csrf_exempt
+@api_view(http_method_names=['GET', 'POST'])
 def snippets(request):
     request_method = request.method
 
     match request_method:
-        case "GET":
+        case 'GET':
             return list_snippets(request=request)
-        case "POST":
+        case 'POST':
             return create_snippets(request=request)
         case _:
-            return HttpResponseNotAllowed(permitted_methods=["GET", "POST"])
+            # Alreay handle by api_view
+            pass
 
 
 def list_snippets(request):
@@ -36,12 +37,7 @@ def list_snippets(request):
 
 
 def create_snippets(request):
-    try:
-        data = JSONParser().parse(request)
-    except ParseError:
-        return HttpResponseBadRequest()
-
-    serializer = SnippetSerializer(data=data)
+    serializer = SnippetSerializer(data=request.data)
 
     if serializer.is_valid():
         serializer.save()
