@@ -3,10 +3,12 @@ import pdb
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.http import HttpResponseNotAllowed
+from django.http import HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import status
 from rest_framework.parsers import JSONParser
+from rest_framework.exceptions import ParseError
 
 from .models.snippet import Snippet
 from .serializers.snippet_serializer import SnippetSerializer
@@ -34,7 +36,11 @@ def list_snippets(request):
 
 
 def create_snippets(request):
-    data = JSONParser().parse(request)
+    try:
+        data = JSONParser().parse(request)
+    except ParseError:
+        return HttpResponseBadRequest()
+
     serializer = SnippetSerializer(data=data)
 
     if serializer.is_valid():
