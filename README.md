@@ -4,7 +4,14 @@
 
 
 ## Setup venv
+
+```bash
+python3 -m venv venv
+python3 -m venv venv
 ```
-python3 -m venv venv
-python3 -m venv venv
+
+## Install packages
+
+```bash
+pip3 install requirements.txt
 ```
